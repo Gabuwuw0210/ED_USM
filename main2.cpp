@@ -30,21 +30,28 @@ int main() {
     std::cout << "Ingrese cantidad de jugadores: ";
     std::cin >> numJugadores;
 
-    int cartasNegras = 11;
-    int cartasRojas = 9;
+    int cartasNegras;
+    int cartasRojas;
 
-    std::cout << "Cantidad de cartas Rojas: " << cartasRojas << std::endl;
-    std::cout << "Cantidad de cartas Negras: " << cartasNegras << std::endl;
+    // Usar puntero a Juego en lugar de un objeto directo
+    Juego* juego = new Juego(tipo, numJugadores);
 
-    Juego juego(tipo, numJugadores);
-    juego.crearManos();
-    juego.imprimirConteoCartas();
+    // Crear las manos
+    juego->crearManos();
 
+    // Imprimir el conteo de cartas
+    juego->imprimirConteoCartas();
+
+    // Generar el nombre del archivo
     std::string nombreArchivo = tipoJuego + std::to_string(numJugadores) + ".txt";
-    juego.guardarArchivo(nombreArchivo);
+
+    // Guardar las manos en el archivo
+    juego->guardarArchivo(nombreArchivo);
 
     std::cout << "Manos guardadas en el archivo '" << nombreArchivo << "'." << std::endl;
 
+    // Liberar la memoria del objeto Juego
+    delete juego;
+
     return 0;
 }
-

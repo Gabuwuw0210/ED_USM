@@ -6,7 +6,7 @@
 int main() {
     srand(time(0)); // Inicializar la semilla del generador de números aleatorios
 
-    std::cout << "Ingrese Juego (P, C o B): ";
+    std::cout << "Ingrese Juego (P, C o B): ";//elegir el juego
     char tipoJuego;
     std::cin >> tipoJuego;
 

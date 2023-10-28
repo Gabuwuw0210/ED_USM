@@ -1,66 +1,86 @@
 #include "DeBlock.hpp"
+#include "Lista.hpp"
+#include "ListaDeListas.hpp"
 
-DeBlock::DeBlock(int* elems, int n, int b) : cant_elems(b) {
-    int bloques = n / b;
-    if (n % b != 0) {
-        bloques++;
-    }
-    for (int i = 0; i < bloques; i++) {
-        Lista bloque;
-        for (int j = i * b; j < (i + 1) * b && j < n; j++) {
-            bloque.insertarAlFinal(elems[j]);
+DeBlock::DeBlock(int* elems, int n, int b) {
+    cant_elems = n;
+    blockSize = b;
+    int num_blocks = (n + b - 1) / b;
+    listArray = new tListaDeListas(num_blocks);
+
+    for (int i = 0; i < num_blocks; i++) {
+        tLista sub_list;
+        for (int j = 0; j < b && (i * b + j < n); j++) {
+            sub_list.insert(sub_list.length(), elems[i * b + j]);
         }
-        l.insertarAlFinal(bloque.obtenerLongitud());
+        listArray->append(sub_list);
     }
+}
+
+DeBlock::~DeBlock() {
+    delete listArray;
 }
 
 int DeBlock::insert(int pos, int elem) {
-    int bloqueIdx = pos / cant_elems;
-    int idxDentroBloque = pos % cant_elems;
-
-    int longitudBloque = l.obtenerValorEnPos(bloqueIdx);
-    if (idxDentroBloque >= longitudBloque) {
-        return 0; // Posición fuera de rango
+    if (pos < 0 || pos > cant_elems) {
+        return 0;
     }
 
-    l.insertarAlFinal(elem);
+    int block_index = pos / blockSize;
+    int pos_in_block = pos % blockSize;
+
+    if (listArray->get_value(block_index).length() >= blockSize) {
+        return 0;
+    }
+
+    listArray->get_value(block_index).insert(pos_in_block, elem);
+    cant_elems++;
     return 1;
 }
 
-int DeBlock::erase(int pos) {
-    int bloqueIdx = pos / cant_elems;
-    int idxDentroBloque = pos % cant_elems;
-
-    int longitudBloque = l.obtenerValorEnPos(bloqueIdx);
-    if (idxDentroBloque >= longitudBloque) {
-        return -1; // Error, posición fuera de rango
-    }
-
-    int valor = l.obtenerValorEnPos(pos);
-    l.limpiar();
-    return valor;
-}
 
 int DeBlock::get_value(int pos) {
-    int bloqueIdx = pos / cant_elems;
-    int idxDentroBloque = pos % cant_elems;
-
-    int longitudBloque = l.obtenerValorEnPos(bloqueIdx);
-    if (idxDentroBloque >= longitudBloque) {
-        return -1; // Error, posición fuera de rango
+    if (pos < 0 || pos >= cant_elems) {
+        return -1;
     }
 
-    return l.obtenerValorEnPos(pos);
+    int block_index = pos / blockSize;
+    int pos_in_block = pos % blockSize;
+
+    return listArray->get_value(block_index).get_value(pos_in_block);
 }
 
+
+
+
+int DeBlock::getBlockSize() const {
+    return blockSize;
+}
+
+int DeBlock::getCantElems() const {
+    return cant_elems;
+}
+
+
+
 int DeBlock::length() {
-    int n = 0;
-    for (int i = 0; i < l.obtenerLongitud(); i++) {
-        n += l.obtenerValorEnPos(i);
+    return cant_elems;
+}
+
+int DeBlock::erase(int pos) {
+    if (pos < 0 || pos >= cant_elems) {
+        return -1;
     }
-    return n;
+
+    int block_index = pos / blockSize;
+    int pos_in_block = pos % blockSize;
+
+    int erased_value = listArray->get_value(block_index).erase(pos_in_block);
+    cant_elems--;
+    return erased_value;
 }
 
 void DeBlock::clear() {
-    l.limpiar();
+    listArray->clear();
+    cant_elems = 0;
 }

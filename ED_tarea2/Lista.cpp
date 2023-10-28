@@ -1,50 +1,66 @@
 #include "Lista.hpp"
 
-Lista::Lista() : primero(nullptr) {}
-
-Lista::~Lista() {
-    limpiar();
+tLista::tLista(unsigned int MAXSIZE) {
+    maxSize = MAXSIZE;
+    size = 0;
+    elements = new int[maxSize];
 }
 
-void Lista::insertarAlFinal(int valor) {
-    Nodo* nuevoNodo = new Nodo(valor);
-    if (!primero) {
-        primero = nuevoNodo;
-    } else {
-        Nodo* actual = primero;
-        while (actual->siguiente) {
-            actual = actual->siguiente;
-        }
-        actual->siguiente = nuevoNodo;
-    }
+tLista::~tLista() {
+    delete[] elements;
 }
 
-void Lista::limpiar() {
-    while (primero) {
-        Nodo* temp = primero;
-        primero = primero->siguiente;
-        delete temp;
-    }
+tLista::tLista() {
+    maxSize=0;
+    size=0;
+    elements= nullptr;
 }
 
-int Lista::obtenerValorEnPos(int pos) {
-    Nodo* actual = primero;
-    for (int i = 0; i < pos; i++) {
-        if (!actual) {
-            // Tratamiento de posición fuera de rango
-            return -1; // Por ejemplo, podrías usar un valor especial para indicar este caso
-        }
-        actual = actual->siguiente;
-    }
-    return actual ? actual->dato : -1; // También aquí puedes usar un valor especial
+void tLista::clear() {
+    size = 0;
 }
 
-int Lista::obtenerLongitud() {
-    int count = 0;
-    Nodo* actual = primero;
-    while (actual) {
-        count++;
-        actual = actual->siguiente;
+int tLista::erase(unsigned int position) {
+    if (position < 0 || position >= size)
+        return -1;
+
+    int item = elements[position];
+    for (unsigned int i = position; i < size - 1; i++) {
+        elements[i] = elements[i + 1];
     }
-    return count;
+
+    size--;
+    return item;
+}
+
+int tLista::append(int item) {
+    if (size >= maxSize)
+        return -1;
+
+    elements[size++] = item;
+    return size - 1;
+}
+
+int tLista::insert(unsigned int position, int item) {
+    if (size >= maxSize || position > size)
+        return -1;
+
+    for (unsigned int i = size; i > position; i--) {
+        elements[i] = elements[i - 1];
+    }
+
+    elements[position] = item;
+    size++;
+    return position;
+}
+
+int tLista::get_value(unsigned int position) {
+    if (position < 0 || position >= size)
+        return -1;
+
+    return elements[position];
+}
+
+int tLista::length() {
+    return size;
 }
